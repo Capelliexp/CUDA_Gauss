@@ -9,10 +9,12 @@ int main(int argc, char *argv[]){
 	for (int i = 0; i < 4; i++)
 		matrix[i] = new float[ROW_LENGTH];
 	float* vector = new float[COLUMN_LENGTH];
+	float* answer = new float[ROW_LENGTH];
 
 	FillMatrixStandard(matrix, vector);
 
-	SortCPU(matrix, vector);
+	SortCPU(matrix, vector, answer);
+	PrintMatrix(matrix, vector, answer);
 
 	getchar();
 	return 0;
@@ -47,7 +49,24 @@ void FillMatrixStandard(float** matrix, float* vector) {
 
 void FillMAtrixRandom(float** matrix, float* vector) {}
 
-void SortCPU(float** matrix, float* vector) {
+void SortCPU(float** matrix, float* vector, float* answer) {
 	ForwardSubstitution(matrix, vector);
-	BackSubstitution(matrix, vector);
+	BackSubstitution(matrix, vector, answer);
+}
+
+void PrintMatrix(float** matrix, float* vector, float* answer) {
+	for (int i = 0; i < COLUMN_LENGTH; i++) {
+		std::cout << "| ";
+		for (int j = 0; j < ROW_LENGTH; j++) {
+			std::cout << matrix[i][j] << " ";
+		}
+		std::cout << " | " << vector[i] << std::endl;
+
+	}
+
+	std::cout << "Answers: ";
+	for (int i = 0; i < COLUMN_LENGTH; i++) {
+		std::cout << answer[i] << " ";
+	}
+	std::cout << std::endl;
 }

@@ -8,7 +8,8 @@
 
 void FillMatrixStandard(float** matrix, float* vector);
 void FillMAtrixRandom(float** matrix, float* vector);
-void SortCPU(float** matrix, float* vector);
+void SortCPU(float** matrix, float* vector, float* answer);
+void PrintMatrix(float** matrix, float* vector, float* answer);
 
 void ForwardSubstitution(float** matrix, float* vector);
-void BackSubstitution(float** matrix, float* vector);
+void BackSubstitution(float** matrix, float* vector, float* answer);

@@ -3,11 +3,11 @@
 
 void ForwardSubstitution(float** m, float* v) {
 	for (int i = 0; i < ROW_LENGTH; i++) {
-		std::cout << "---" << std::endl;
+		//std::cout << "---" << std::endl;
 		for (int j = 0; j < COLUMN_LENGTH - 1; j++) {
 			if ((i + j + 1) < COLUMN_LENGTH) {
 				float factor = (m[i + j + 1][i] / m[i][i]) * (-1);
-				std::cout << "factor: " << factor << std::endl;
+				//std::cout << "factor: " << factor << std::endl;
 				for (int k = 0; k < ROW_LENGTH; k++) {
 					m[i + j + 1][k] += (factor * m[i][k]);
 				}
@@ -17,8 +17,11 @@ void ForwardSubstitution(float** m, float* v) {
 	}
 }
 
-void BackSubstitution(float** matrix, float* vector) {
-	float* answers = new float[ROW_LENGTH];
-
-
+void BackSubstitution(float** m, float* v, float* a) {
+	for (int i = ROW_LENGTH - 1; i >= 0; i--) {
+		for (int j = ROW_LENGTH - 1; j > i; j--) {
+			v[i] -= a[j]*m[i][j];
+		}
+		a[i] = v[i]/m[i][i];
+	}
 }
