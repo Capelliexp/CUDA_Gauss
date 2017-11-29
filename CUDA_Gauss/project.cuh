@@ -1,5 +1,7 @@
 #pragma once
 #include <stdio.h>
+#include <string>
+#include <iostream>
 
 #define COLUMN_LENGTH 4 // y
 #define ROW_LENGTH 4	// x
