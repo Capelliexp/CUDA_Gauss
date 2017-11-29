@@ -1,12 +1,9 @@
 
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
-#include "CPU_Functions.cu"
+//#include "cuda_runtime.h"
+//#include "device_launch_parameters.h"
+//#include "CPU_Functions.cu"
 
-#include <stdio.h>
-
-#define COLUMN_LENGTH 4 // y
-#define ROW_LENGTH 4	// x
+#include "project.cuh"
 
 int main(int argc, char *argv[]){
 	float** matrix = new float*[COLUMN_LENGTH];
@@ -18,6 +15,7 @@ int main(int argc, char *argv[]){
 
 	SortCPU(matrix, vector);
 
+	getchar();
 	return 0;
 }
 
@@ -51,7 +49,6 @@ void FillMatrixStandard(float** matrix, float* vector) {
 void FillMAtrixRandom(float** matrix, float* vector) {}
 
 void SortCPU(float** matrix, float* vector) {
-	OrderMatrixBySize(matrix);
 	ForwardSubstitution(matrix, vector);
 	BackSubstitution(matrix, vector);
 }
