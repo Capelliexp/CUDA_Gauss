@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]){
 	float** matrix = new float*[COLUMN_LENGTH];
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < COLUMN_LENGTH; i++)
 		matrix[i] = new float[ROW_LENGTH];
 	float* vector = new float[COLUMN_LENGTH];
 	float* answer = new float[ROW_LENGTH];
@@ -41,10 +41,16 @@ void FillMatrixStandard(float** matrix, float* vector) {
 	matrix[3][2] = -1.f;
 	matrix[3][3] = -2.f;
 
+	/*matrix[4][0] = 1.f;
+	matrix[4][1] = 2.f;
+	matrix[4][2] = -1.f;
+	matrix[4][3] = -2.f;*/
+
 	vector[0] = 14.f;
 	vector[1] = 20.f;
 	vector[2] = 9.f;
 	vector[3] = 3.f;
+	vector[4] = 3.f;
 }
 
 void FillMAtrixRandom(float** matrix, float* vector) {}
@@ -65,7 +71,7 @@ void PrintMatrix(float** matrix, float* vector, float* answer) {
 	}
 
 	std::cout << "Answers: ";
-	for (int i = 0; i < COLUMN_LENGTH; i++) {
+	for (int i = 0; i < ROW_LENGTH; i++) {
 		std::cout << answer[i] << " ";
 	}
 	std::cout << std::endl;
