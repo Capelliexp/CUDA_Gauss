@@ -5,13 +5,18 @@
 #include <time.h>
 #include <math.h>
 
-#define COLUMN_LENGTH 8 // y
-#define ROW_LENGTH 8	// x
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 
-void FillMatrixStandard(float** matrix, float* vector);
+#define COLUMN_LENGTH 4 // y
+#define ROW_LENGTH 4	// x
+
 void FillMAtrixRandom(float** matrix, float* vector);
 void SortCPU(float** matrix, float* vector, float* answer);
 void PrintMatrix(float** matrix, float* vector, float* answer);
 
 void ForwardSubstitution(float** matrix, float* vector);
 void BackSubstitution(float** matrix, float* vector, float* answer);
+
+void InitCUDA(float** m, float* v, float* a);
+void cuErrorCheck(cudaError_t cs);
