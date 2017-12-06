@@ -22,6 +22,13 @@ void BackSubstitution(float** m, float* v, float* a) {
 		for (int j = ROW_LENGTH - 1; j > i; j--) {
 			v[i] -= a[j]*m[i][j];
 		}
-		a[i] = v[i]/m[i][i];
+
+		float temp = v[i] / m[i][i];
+		if (temp - (int)temp < 0.0001f){
+			a[i] = (int)temp;
+		}
+		else if (temp - (int)temp > 0.99f) {
+			a[i] = (int)temp + 1;
+		}
 	}
 }
