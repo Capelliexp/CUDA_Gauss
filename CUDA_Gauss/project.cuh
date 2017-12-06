@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include <time.h>
+#include <math.h>
 
-#define COLUMN_LENGTH 4 // y
-#define ROW_LENGTH 4	// x
+#define COLUMN_LENGTH 8 // y
+#define ROW_LENGTH 8	// x
 
 void FillMatrixStandard(float** matrix, float* vector);
 void FillMAtrixRandom(float** matrix, float* vector);
