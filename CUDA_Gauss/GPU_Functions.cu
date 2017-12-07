@@ -1,20 +1,27 @@
 #include "project.cuh"
 
 __global__
-void DeviceGaussForward(float** d_m, float* d_v, float* d_a) {
+void DeviceGaussForward(float** d_m, float* d_v) {
 	int id = threadIdx.x + blockDim.x * blockIdx.x;
 	++id;
 	int i = 0;
 
-	__shared__ float pivot[ROW_LENGTH];
-	float row[ROW_LENGTH];
-	memcpy(row, d_m[id], sizeof(float)*ROW_LENGTH);
+	__shared__ float pivotLHS[ROW_LENGTH];
+	__shared__ float pivotRHS;
+	float LHS[ROW_LENGTH];
+	float RHS = d_v[id];
+
+	memcpy(LHS, d_m[id], sizeof(float)*ROW_LENGTH);
 
 	while (id > i && id < COLUMN_LENGTH) {
-		memcpy(pivot, d_m[i], sizeof(float)*ROW_LENGTH);
-		float factor = (row[i] / pivot[i]) * (-1);
+		memcpy(pivotLHS, d_m[i], sizeof(float)*ROW_LENGTH);
+		pivotRHS = d_v[i];
+		float factor = (LHS[i] / pivotLHS[i]) * (-1);
 
-
+		for (int j = 0; j < ROW_LENGTH; j++) {
+			LHS[j] += (factor * pivotLHS[j]);
+		}
+		RHS += (factor * pivotRHS);
 
 		++i;
 		__syncthreads();
