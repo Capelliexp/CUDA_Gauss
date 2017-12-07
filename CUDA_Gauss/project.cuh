@@ -20,3 +20,5 @@ void BackSubstitution(float** matrix, float* vector, float* answer);
 
 void InitCUDA(float** m, float* v, float* a);
 void cuErrorCheck(cudaError_t cs);
+
+__global__ void DeviceGaussForward(float** d_m, float* d_v, float* d_a);

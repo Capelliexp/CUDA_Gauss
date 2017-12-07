@@ -1,5 +1,26 @@
 #include "project.cuh"
 
+__global__
+void DeviceGaussForward(float** d_m, float* d_v, float* d_a) {
+	int id = threadIdx.x + blockDim.x * blockIdx.x;
+	++id;
+	int i = 0;
+
+	__shared__ float pivot[ROW_LENGTH];
+	float row[ROW_LENGTH];
+	memcpy(row, d_m[id], sizeof(float)*ROW_LENGTH);
+
+	while (id > i && id < COLUMN_LENGTH) {
+		memcpy(pivot, d_m[i], sizeof(float)*ROW_LENGTH);
+		float factor = (row[i] / pivot[i]) * (-1);
+
+
+
+		++i;
+		__syncthreads();
+	}
+}
+
 void InitCUDA(float** m, float* v, float* a) {
 	float** d_m = nullptr;
 	float* d_v = nullptr;
@@ -16,6 +37,11 @@ void InitCUDA(float** m, float* v, float* a) {
 	cuErrorCheck(cudaMemcpy(d_v, v, COLUMN_LENGTH * sizeof(float), cudaMemcpyHostToDevice));
 	cuErrorCheck(cudaMemcpy(d_a, a, COLUMN_LENGTH * sizeof(float), cudaMemcpyHostToDevice));
 
+
+
+	cudaFree(d_m);
+	cudaFree(d_v);
+	cudaFree(d_a);
 }
 
 void cuErrorCheck(cudaError_t cs)
