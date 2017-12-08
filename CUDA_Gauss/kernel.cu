@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
 	//Device
 	FillMAtrixRandom(matrix, vector);
 	InitCUDA(matrix, vector, answer);
-	PrintMatrix(matrix, vector, answer);
+	//PrintMatrix(matrix, vector, answer);
 
 	free(matrix);
 	free(vector);
