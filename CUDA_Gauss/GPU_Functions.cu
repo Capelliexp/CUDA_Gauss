@@ -63,6 +63,11 @@ void DeviceGaussForwardUpper(float* d_m, float* d_v, float* d_a) {
 		}
 
 		int iterator = 0;
+
+		if (id == COLUMN_LENGTH-1) {
+			d_a[id] = RHS / LHS[ROW_LENGTH-1];
+		}
+
 		while (id < i) {
 			__syncthreads();
 			pivotRHS = d_v[i];
@@ -131,7 +136,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	cuErrorCheck(cudaMemcpy(d_a, a, COLUMN_LENGTH * sizeof(float), cudaMemcpyHostToDevice));
 
 	//cudaEventRecord(start);
-	DeviceGaussForwardLower<<<1, 4>>>(d_m, d_v);	//upper
+	DeviceGaussForwardLower<<<1, 5>>>(d_m, d_v);	//upper
 	cuErrorCheck(cudaGetLastError());
 	//cudaEventRecord(stop);
 
@@ -146,7 +151,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	PrintMatrix(cuda_m, v, a);
 
 	//cudaEventRecord(start);
-	DeviceGaussForwardUpper<<<1, 4>>>(d_m, d_v, d_a);	//lower
+	DeviceGaussForwardUpper<<<1, 5>>>(d_m, d_v, d_a);	//lower
 	cuErrorCheck(cudaGetLastError());
 	//cudaEventRecord(stop);
 
