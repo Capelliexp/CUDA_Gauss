@@ -42,7 +42,6 @@ void InitCUDA(float** m, float* v, float* a) {
 	float* d_v = nullptr;
 	float* d_a = nullptr;
 
-
 	float* cuda_m = new float[ROW_LENGTH*COLUMN_LENGTH];
 	for (int i = 0; i < COLUMN_LENGTH; i++){
 		for (int j = 0; j < ROW_LENGTH; j++) {
@@ -61,7 +60,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	cuErrorCheck(cudaMemcpy(d_v, v, COLUMN_LENGTH * sizeof(float), cudaMemcpyHostToDevice));
 	cuErrorCheck(cudaMemcpy(d_a, a, COLUMN_LENGTH * sizeof(float), cudaMemcpyHostToDevice));
 
-	DeviceGaussForward<<<1, 4>>>(d_m, d_v);
+	DeviceGaussForward<<<2, 2>>>(d_m, d_v);
 	cuErrorCheck(cudaGetLastError());
 
 	cuErrorCheck(cudaMemcpy(cuda_m, d_m, ROW_LENGTH * COLUMN_LENGTH * sizeof(float), cudaMemcpyDeviceToHost));
@@ -73,11 +72,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	}
 	std::cout << std::endl;*/
 
-	for (int i = 0; i < COLUMN_LENGTH; i++) {
-		for (int j = 0; j < ROW_LENGTH; j++)
-			std::cout << cuda_m[(i*ROW_LENGTH) + j] << " ";
-		std::cout << std::endl;
-	}
+	PrintMatrix(cuda_m, v, a);
 
 	cudaFree(d_m);
 	cudaFree(d_v);

@@ -14,6 +14,7 @@
 void FillMAtrixRandom(float** matrix, float* vector);
 void SortCPU(float** matrix, float* vector, float* answer);
 void PrintMatrix(float** matrix, float* vector, float* answer);
+void PrintMatrix(float* matrix, float* vector, float* answer);
 
 void ForwardSubstitution(float** matrix, float* vector);
 void BackSubstitution(float** matrix, float* vector, float* answer);
@@ -21,5 +22,4 @@ void BackSubstitution(float** matrix, float* vector, float* answer);
 void InitCUDA(float** m, float* v, float* a);
 void cuErrorCheck(cudaError_t cs);
 
-__global__ void DeviceGaussForward(float** d_m/*, float* d_v*/);
-__device__ void FloatArrayCpy(float* dst, float* src, int length);
+__global__ void DeviceGaussForward(float* d_m, float* d_v);
