@@ -34,7 +34,8 @@ int main(int argc, char *argv[]){
 void FillMAtrixRandom(float** matrix, float* vector) {
 	for (int i = 0; i < COLUMN_LENGTH; i++) {	//generate matrix[][]
 		for (int j = 0; j < ROW_LENGTH; j++) {
-			matrix[i][j] = (int)rand()%(COLUMN_LENGTH*ROW_LENGTH) + 1;
+			//matrix[i][j] = (int)rand() % (COLUMN_LENGTH*ROW_LENGTH) + 1;
+			matrix[i][j] = (int)rand()%(4) + 1;
 			if ((int)rand()%3 == 0)
 				matrix[i][j] *= -1;
 		}
@@ -43,7 +44,8 @@ void FillMAtrixRandom(float** matrix, float* vector) {
 	std::cout << "SOLUTION:" << std::endl;
 	int* answers = new int[COLUMN_LENGTH];
 	for (int i = 0; i < COLUMN_LENGTH; i++) {	//generate solution[] (x,y,z... values)
-		answers[i] = (int)rand()%(COLUMN_LENGTH*ROW_LENGTH) + 1;
+		//answers[i] = (int)rand() % (COLUMN_LENGTH*ROW_LENGTH) + 1;
+		answers[i] = (int)rand()%(4) + 1;
 		if ((int)rand() % 3 == 0)
 			answers[i] *= -1;
 		std::cout << answers[i] << " ";
