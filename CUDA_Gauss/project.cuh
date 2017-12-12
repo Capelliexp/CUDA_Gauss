@@ -11,6 +11,11 @@
 #define COLUMN_LENGTH 4 // y
 #define ROW_LENGTH 4 // x
 
+#define NR_OF_BLOCKS 1
+#define THREADS_PER_BLOCK 4
+
+#define ELEMENTS_PER_THREAD (int)(COLUMN_LENGTH/THREADS_PER_BLOCK)
+
 void FillMAtrixRandom(float** matrix, float* vector);
 void SortCPU(float** matrix, float* vector, float* answer);
 void PrintMatrix(float** matrix, float* vector, float* answer);

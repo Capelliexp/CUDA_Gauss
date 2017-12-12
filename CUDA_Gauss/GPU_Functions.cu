@@ -45,64 +45,71 @@ __global__
 void DeviceGaussForwardUpper(float* d_m, float* d_v, float* d_a) {
 	int id = threadIdx.x + blockIdx.x * blockDim.x;
 
-	if (id < COLUMN_LENGTH) {
+	if ((id *= ELEMENTS_PER_THREAD) < COLUMN_LENGTH) {
 		int i = COLUMN_LENGTH - 1;
 		double factor;
 
 		__shared__ double pivotRHS;
 		__shared__ double pivotLHS[ROW_LENGTH];
 
-		double RHS = d_v[id];
-		double LHS[ROW_LENGTH];
+		double RHS[ELEMENTS_PER_THREAD];
+		double LHS[ELEMENTS_PER_THREAD][ROW_LENGTH];
 
-		for (int j = 0; j < ROW_LENGTH; ++j) {
-			int pos = (id * ROW_LENGTH) + j;
-			double a = d_m[pos];
-			LHS[j] = a;
-			//printf("id %d: LHS[%d] = %f \n",id, j, LHS[j]);
+		for (int j = 0; j < ELEMENTS_PER_THREAD; ++j) {
+			RHS[j] = d_v[id+j];
 		}
-
-		int iterator = 0;
-
-		if (id == COLUMN_LENGTH-1) {
-			d_a[id] = RHS / LHS[ROW_LENGTH-1];
+		
+		for (int k = 0; k < ELEMENTS_PER_THREAD; ++k) {
+			for (int j = 0; j < ROW_LENGTH; ++j) {
+				int pos = (k+1)*(id * ROW_LENGTH) + j;
+				double a = d_m[pos];
+				LHS[k][j] = a;
+				//printf("id %d: LHS[%d] = %f \n",id, j, LHS[j]);
+			}
 		}
 
 		while (id < i) {
 			__syncthreads();
+
 			pivotRHS = d_v[i];
 
 			for (int j = 0; j < ROW_LENGTH; ++j) {
 				pivotLHS[j] = d_m[i*ROW_LENGTH + j];
 			}
 
-			double a = LHS[i];
-			double b = pivotLHS[i];
-			double c = (a / b);
-			factor = c * (-1);
-			//factor = (LHS[i] / pivotLHS[i]) * (-1);
+			for (int g = 0; g < ELEMENTS_PER_THREAD; ++g) {
+				if (id+g < i) {
+					double a = LHS[g][i];
+					double b = pivotLHS[i];
+					double c = (a / b);
+					factor = c * (-1);
+					//factor = (LHS[i] / pivotLHS[i]) * (-1);
 
-			//if (id == 0) printf("factor: %f \n", factor);
-			for (int j = 0; j < ROW_LENGTH; j++) {
-				LHS[j] += (factor * pivotLHS[j]);
-				//if (id == 0) printf("i %d: LHS[%d] = %f \n",i, j, LHS[j]);
-			}
-			//printf("\n");
+					//if (id == 0) printf("factor: %f \n", factor);
+					for (int j = 0; j < ROW_LENGTH; j++) {
+						LHS[g][j] += (factor * pivotLHS[j]);
+						//if (id == 0) printf("i %d: LHS[%d] = %f \n",i, j, LHS[j]);
+					}
+					//printf("\n");
 
-			RHS += (factor * pivotRHS);
-
-			--i;
-			++iterator;
-
-			if (!(id < i)) {
-				for (int j = 0; j < ROW_LENGTH; ++j) {
-					d_m[ROW_LENGTH*id + j] = LHS[j];
+					RHS[g] += (factor * pivotRHS);
 				}
-				d_v[id] = RHS;
-				d_a[id] = RHS / LHS[i];
+				--i;
+
+				if (!(id+g < i)) {
+					for (int j = 0; j < ROW_LENGTH; ++j) {
+						d_m[ROW_LENGTH*id+g + j] = LHS[g][j];
+					}
+					d_v[id + g] = RHS[g];
+					d_a[id + g] = RHS[g] / LHS[g][i];
+				}
 			}
-			
 		}
+
+		if (id == COLUMN_LENGTH - 1) {
+			d_a[id] = RHS[0] / LHS[0][ROW_LENGTH - 1];	//fel?
+		}
+
 	}
 }
 
@@ -136,7 +143,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	cuErrorCheck(cudaMemcpy(d_a, a, COLUMN_LENGTH * sizeof(float), cudaMemcpyHostToDevice));
 
 	//cudaEventRecord(start);
-	DeviceGaussForwardLower<<<1, 5>>>(d_m, d_v);	//upper
+	DeviceGaussForwardLower<<<1, 4>>>(d_m, d_v);	//upper
 	cuErrorCheck(cudaGetLastError());
 	//cudaEventRecord(stop);
 
@@ -151,7 +158,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	PrintMatrix(cuda_m, v, a);
 
 	//cudaEventRecord(start);
-	DeviceGaussForwardUpper<<<1, 5>>>(d_m, d_v, d_a);	//lower
+	DeviceGaussForwardUpper<<<1, 4>>>(d_m, d_v, d_a);	//lower
 	cuErrorCheck(cudaGetLastError());
 	//cudaEventRecord(stop);
 
