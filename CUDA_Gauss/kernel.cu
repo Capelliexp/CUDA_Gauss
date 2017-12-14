@@ -84,8 +84,8 @@ void PrintMatrix(float** matrix, float* vector, float* answer) {
 	std::cout << std::endl << std::endl;
 }
 
-void PrintMatrix(float* matrix, float* vector, float* answer) {
-	std::cout << "Equation: " << std::endl;
+void PrintMatrix(std::string stuff, float* matrix, float* vector, float* answer) {
+	std::cout << stuff << ":" << std::endl;
 	for (int i = 0; i < COLUMN_LENGTH; i++) {
 		std::cout << "| ";
 		for (int j = 0; j < ROW_LENGTH; j++) {
@@ -94,7 +94,7 @@ void PrintMatrix(float* matrix, float* vector, float* answer) {
 		std::cout << " | " << vector[i] << std::endl;
 	}
 
-	std::cout << std::endl << "Answers: ";
+	std::cout << std::endl << stuff << " answers: ";
 	for (int i = 0; i < ROW_LENGTH; i++) {
 		std::cout << (answer[i] == -431602080 ? "NaN" : std::to_string(answer[i])) << " ";
 	}

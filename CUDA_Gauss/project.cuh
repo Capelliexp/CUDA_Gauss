@@ -12,14 +12,14 @@
 #define ROW_LENGTH 4 // x
 
 #define NR_OF_BLOCKS 1
-#define THREADS_PER_BLOCK 4
+#define THREADS_PER_BLOCK 2
 
 #define ELEMENTS_PER_THREAD (int)(COLUMN_LENGTH/THREADS_PER_BLOCK)
 
 void FillMAtrixRandom(float** matrix, float* vector);
 void SortCPU(float** matrix, float* vector, float* answer);
 void PrintMatrix(float** matrix, float* vector, float* answer);
-void PrintMatrix(float* matrix, float* vector, float* answer);
+void PrintMatrix(std::string stuff, float* matrix, float* vector, float* answer);
 
 void ForwardSubstitution(float** matrix, float* vector);
 void BackSubstitution(float** matrix, float* vector, float* answer);
