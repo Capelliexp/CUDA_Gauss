@@ -7,7 +7,8 @@ int main(int argc, char *argv[]){
 	for (int i = 0; i < COLUMN_LENGTH; i++)
 		matrix[i] = new float[ROW_LENGTH];
 	float* vector = new float[COLUMN_LENGTH];
-	float* answer = new float[ROW_LENGTH];
+	float* answer = new float[COLUMN_LENGTH];
+	int* key = new int[COLUMN_LENGTH];
 
 	//HOST
 	/*FillMAtrixRandom(matrix, vector);
@@ -19,20 +20,22 @@ int main(int argc, char *argv[]){
 	//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 	
 	//Device
-	FillMatrixRandom(matrix, vector);
+	key = FillMatrixRandom(matrix, vector);
 	//FillMatrixDefault(matrix, vector);
 	PrintMatrix(matrix, vector, answer);
 	InitCUDA(matrix, vector, answer);
+	CheckAnswer(answer, key);
 	//PrintMatrix(matrix, vector, answer);
 	getchar();
 
 	free(matrix);
 	free(vector);
 	free(answer);
+	free(key);
 	return 0;
 }
 
-void FillMatrixRandom(float** matrix, float* vector) {
+int* FillMatrixRandom(float** matrix, float* vector) {
 	for (int i = 0; i < COLUMN_LENGTH; i++) {	//generate matrix[][]
 		for (int j = 0; j < ROW_LENGTH; j++) {
 			//matrix[i][j] = (int)rand() % (COLUMN_LENGTH*ROW_LENGTH) + 1;
@@ -59,7 +62,7 @@ void FillMatrixRandom(float** matrix, float* vector) {
 			vector[i] += matrix[i][j] * answers[j];
 	}
 
-	free(answers);
+	return answers;
 }
 
 void FillMatrixDefault(float ** matrix, float * vector){
@@ -106,12 +109,12 @@ void PrintMatrix(float** matrix, float* vector, float* answer) {
 		std::cout << " | " << vector[i] << std::endl;
 	}
 
-	std::cout << std::endl << "Answers: ";
+	/*std::cout << std::endl << "Answers: ";
 	for (int i = 0; i < ROW_LENGTH; i++) {
 		std::cout << (answer[i] == -431602080 ? "NaN" : std::to_string(answer[i])) << " ";
-	}
+	}*/
 
-	std::cout << std::endl << std::endl;
+	std::cout << std::endl;
 }
 
 void PrintMatrix(std::string stuff, float* matrix, float* vector, float* answer) {
@@ -130,4 +133,14 @@ void PrintMatrix(std::string stuff, float* matrix, float* vector, float* answer)
 	}
 
 	std::cout << std::endl << std::endl;
+}
+
+void CheckAnswer(float* answer, int* key) {
+	for (int i = 0; i < COLUMN_LENGTH; i++) {
+		if (abs(answer[i] - key[i]) > 0.001) {
+			std::cout << "answer incorrect" << std::endl;
+			return;
+		}
+	}
+	std::cout << "CORRECT!" << std::endl;
 }

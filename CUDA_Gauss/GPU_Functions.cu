@@ -199,7 +199,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	cuErrorCheck(cudaMemcpy(cuda_m, d_m, ROW_LENGTH * COLUMN_LENGTH * sizeof(float), cudaMemcpyDeviceToHost));
 	cuErrorCheck(cudaMemcpy(v, d_v, COLUMN_LENGTH * sizeof(float), cudaMemcpyDeviceToHost));
 
-	PrintMatrix("After lower", cuda_m, v, a);
+	//PrintMatrix("After lower", cuda_m, v, a);
 
 	//cudaEventRecord(start);
 	DeviceGaussForwardUpper<<<NR_OF_BLOCKS, THREADS_PER_BLOCK>>>(d_m, d_v, d_a);	//lower
@@ -215,7 +215,13 @@ void InitCUDA(float** m, float* v, float* a) {
 	cuErrorCheck(cudaMemcpy(v, d_v, COLUMN_LENGTH * sizeof(float), cudaMemcpyDeviceToHost));
 	cuErrorCheck(cudaMemcpy(a, d_a, COLUMN_LENGTH * sizeof(float), cudaMemcpyDeviceToHost));
 
-	PrintMatrix("After upper", cuda_m, v, a);
+	//PrintMatrix("After upper", cuda_m, v, a);
+
+	std::cout << "GPU solution:" << std::endl;
+	for (int i = 0; i < COLUMN_LENGTH-1; i++) {
+		std::cout << a[i] << ", ";
+	}
+	std::cout << a[COLUMN_LENGTH - 1] << std::endl << std::endl;
 
 	//Free memory
 	cudaFree(d_m);
