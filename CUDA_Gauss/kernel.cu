@@ -19,8 +19,8 @@ int main(int argc, char *argv[]){
 	//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 	
 	//Device
-	//FillMatrixRandom(matrix, vector);
-	FillMatrixDefault(matrix, vector);
+	FillMatrixRandom(matrix, vector);
+	//FillMatrixDefault(matrix, vector);
 	PrintMatrix(matrix, vector, answer);
 	InitCUDA(matrix, vector, answer);
 	//PrintMatrix(matrix, vector, answer);

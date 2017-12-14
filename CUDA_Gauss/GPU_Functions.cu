@@ -59,7 +59,7 @@ void DeviceGaussForwardLower(float* d_m, float* d_v) {
 				}
 				d_v[id + g] = (abs(RHS[g]) < 0.001 ? 0 : RHS[g]);
 
-				/*if (!((id + g) > (i-1))) {
+				/*if (!((id + g) > (i-1))) {	//FLYTTA IFSATSEN ÖVERS I WHILE OCH TESTA DÅ. KÖR SYNC EFTER IF
 					
 				}*/
 			}
@@ -119,15 +119,30 @@ void DeviceGaussForwardUpper(float* d_m, float* d_v, float* d_a) {
 					}
 					//printf("\n");
 
-					RHS[g] += (factor * pivotRHS);
+					float piv = pivotRHS;
+					float pivAndFac = piv*factor;
+					float RightHandSideOfG = RHS[g];
+					float value = RightHandSideOfG + pivAndFac;
+					RHS[g] = value;
 				}
 
 				for (int j = 0; j < ROW_LENGTH; ++j) {
-					d_m[ROW_LENGTH*(id + g) + j] = LHS[g][j];	//fel?
+					int pos = ROW_LENGTH*(id + g) + j;
+					float value = LHS[g][j];
+					d_m[pos] = value;	//fel?
 				}
-				d_v[id + g] = RHS[g];
-				d_a[id + g] = RHS[g] / LHS[g][i];	//antagligen rätt...
+				float value1 = RHS[g];
+				d_v[id + g] = value1;
 
+				//float denominator = LHS[g][i];
+				//float value2 = RHS[g] / denominator;	//antagligen rätt...
+				//d_a[id + g] = value2;
+
+				//float denominator = d_m[(g*ROW_LENGTH) + (id*ROW_LENGTH) + i];
+				//float value2 = d_v[id + g] / denominator;	//antagligen rätt...
+				//d_a[id + g] = value2;
+
+				d_a[id + g] = d_v[id + g] / d_m[(id + g)*ROW_LENGTH + (g == 0 ? i-1 : i)];
 				/*if (!(id+g < i)) {
 					
 				}*/
@@ -172,7 +187,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	cuErrorCheck(cudaMemcpy(d_a, a, COLUMN_LENGTH * sizeof(float), cudaMemcpyHostToDevice));
 
 	//cudaEventRecord(start);
-	DeviceGaussForwardLower<<<1, 4>>>(d_m, d_v);	//upper
+	DeviceGaussForwardLower<<<NR_OF_BLOCKS, THREADS_PER_BLOCK>>>(d_m, d_v);	//upper
 	cuErrorCheck(cudaGetLastError());
 	//cudaEventRecord(stop);
 
@@ -187,7 +202,7 @@ void InitCUDA(float** m, float* v, float* a) {
 	PrintMatrix("After lower", cuda_m, v, a);
 
 	//cudaEventRecord(start);
-	DeviceGaussForwardUpper<<<1, 4>>>(d_m, d_v, d_a);	//lower
+	DeviceGaussForwardUpper<<<NR_OF_BLOCKS, THREADS_PER_BLOCK>>>(d_m, d_v, d_a);	//lower
 	cuErrorCheck(cudaGetLastError());
 	//cudaEventRecord(stop);
 
