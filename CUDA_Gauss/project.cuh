@@ -16,7 +16,8 @@
 
 #define ELEMENTS_PER_THREAD (int)(COLUMN_LENGTH/THREADS_PER_BLOCK)
 
-void FillMAtrixRandom(float** matrix, float* vector);
+void FillMatrixRandom(float** matrix, float* vector);
+void FillMatrixDefault(float** matrix, float* vector);
 void SortCPU(float** matrix, float* vector, float* answer);
 void PrintMatrix(float** matrix, float* vector, float* answer);
 void PrintMatrix(std::string stuff, float* matrix, float* vector, float* answer);

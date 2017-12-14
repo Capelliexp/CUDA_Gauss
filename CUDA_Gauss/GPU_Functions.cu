@@ -16,13 +16,15 @@ void DeviceGaussForwardLower(float* d_m, float* d_v) {
 		double LHS[ELEMENTS_PER_THREAD][ROW_LENGTH];
 
 		for (int j = 0; j < ELEMENTS_PER_THREAD; ++j) {
-			RHS[j] = d_v[id + j];
+			float value = d_v[id + j];
+			RHS[j] = value;
 		}
 
 		for (int k = 0; k < ELEMENTS_PER_THREAD; ++k) {
 			for (int j = 0; j < ROW_LENGTH; ++j) {
 				int pos = ((id+k) * ROW_LENGTH) + j;	//fel?
-				LHS[k][j] = d_m[pos];
+				float value = d_m[pos];
+				LHS[k][j] = value;
 			}
 		}
 
@@ -32,7 +34,8 @@ void DeviceGaussForwardLower(float* d_m, float* d_v) {
 			pivotRHS = d_v[i];
 
 			for (int j = 0; j < ROW_LENGTH; ++j) {
-				pivotLHS[j] = d_m[i*ROW_LENGTH + j];
+				float value = d_m[i*ROW_LENGTH + j];
+				pivotLHS[j] = value;
 			}
 
 			for (int g = 0; g < ELEMENTS_PER_THREAD; ++g) {
@@ -43,19 +46,20 @@ void DeviceGaussForwardLower(float* d_m, float* d_v) {
 					factor = c * (-1);
 					//factor = (LHS[g][i] / pivotLHS[i]) * (-1);
 
-					for (int j = i; j < ROW_LENGTH; j++) {
-						float newNumber = LHS[g][j] + (factor * pivotLHS[j]);
-						LHS[g][j] = newNumber;
+					for (int j = i; j < ROW_LENGTH; ++j) {
+						float value = LHS[g][j] + (factor * pivotLHS[j]);
+						LHS[g][j] = value;
 					}
-					RHS[g] += (factor * pivotRHS);
+					float value = RHS[g] + (factor * pivotRHS);
+					RHS[g] = value;
 				}
 
 				for (int j = 0; j < ROW_LENGTH; ++j) {
-					d_m[ROW_LENGTH*(id + g) + j] = LHS[g][j];
+					d_m[ROW_LENGTH*(id + g) + j] = (abs(LHS[g][j]) < 0.001 ? 0 : LHS[g][j]);
 				}
-				d_v[id + g] = RHS[g];
+				d_v[id + g] = (abs(RHS[g]) < 0.001 ? 0 : RHS[g]);
 
-				/*if ((id+g) > (COLUMN_LENGTH-1)) {
+				/*if (!((id + g) > (i-1))) {
 					
 				}*/
 			}
@@ -84,7 +88,7 @@ void DeviceGaussForwardUpper(float* d_m, float* d_v, float* d_a) {
 		
 		for (int k = 0; k < ELEMENTS_PER_THREAD; ++k) {
 			for (int j = 0; j < ROW_LENGTH; ++j) {
-				int pos = (k+1)*(id * ROW_LENGTH) + j;
+				int pos = (k*ROW_LENGTH)+(id * ROW_LENGTH) + j;
 				double a = d_m[pos];
 				LHS[k][j] = a;
 				//printf("id %d: LHS[%d] = %f \n",id, j, LHS[j]);
@@ -117,16 +121,18 @@ void DeviceGaussForwardUpper(float* d_m, float* d_v, float* d_a) {
 
 					RHS[g] += (factor * pivotRHS);
 				}
-				--i;
 
-				if (!(id+g < i)) {
-					for (int j = 0; j < ROW_LENGTH; ++j) {
-						d_m[ROW_LENGTH*(id+g) + j] = LHS[g][j];	//fel?
-					}
-					d_v[id + g] = RHS[g];
-					d_a[id + g] = RHS[g] / LHS[g][i];	//antagligen rätt...
+				for (int j = 0; j < ROW_LENGTH; ++j) {
+					d_m[ROW_LENGTH*(id + g) + j] = LHS[g][j];	//fel?
 				}
+				d_v[id + g] = RHS[g];
+				d_a[id + g] = RHS[g] / LHS[g][i];	//antagligen rätt...
+
+				/*if (!(id+g < i)) {
+					
+				}*/
 			}
+			--i;
 		}
 
 		if (id == COLUMN_LENGTH - 1) {

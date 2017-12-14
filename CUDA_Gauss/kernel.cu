@@ -19,7 +19,8 @@ int main(int argc, char *argv[]){
 	//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 	
 	//Device
-	FillMAtrixRandom(matrix, vector);
+	//FillMatrixRandom(matrix, vector);
+	FillMatrixDefault(matrix, vector);
 	PrintMatrix(matrix, vector, answer);
 	InitCUDA(matrix, vector, answer);
 	//PrintMatrix(matrix, vector, answer);
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
-void FillMAtrixRandom(float** matrix, float* vector) {
+void FillMatrixRandom(float** matrix, float* vector) {
 	for (int i = 0; i < COLUMN_LENGTH; i++) {	//generate matrix[][]
 		for (int j = 0; j < ROW_LENGTH; j++) {
 			//matrix[i][j] = (int)rand() % (COLUMN_LENGTH*ROW_LENGTH) + 1;
@@ -59,6 +60,35 @@ void FillMAtrixRandom(float** matrix, float* vector) {
 	}
 
 	free(answers);
+}
+
+void FillMatrixDefault(float ** matrix, float * vector){
+	matrix[0][0] = 2;
+	matrix[0][1] = 1;
+	matrix[0][2] = -1;
+	matrix[0][3] = 2;
+
+	matrix[1][0] = 4;
+	matrix[1][1] = 5;
+	matrix[1][2] = -3;
+	matrix[1][3] = 6;
+
+	matrix[2][0] = -2;
+	matrix[2][1] = 5;
+	matrix[2][2] = -2;
+	matrix[2][3] = 6;
+
+	matrix[3][0] = 4;
+	matrix[3][1] = 11;
+	matrix[3][2] = -4;
+	matrix[3][3] = 8;
+
+	//---
+
+	vector[0] = 5;
+	vector[1] = 9;
+	vector[2] = 4;
+	vector[3] = 2;
 }
 
 void SortCPU(float** matrix, float* vector, float* answer) {
