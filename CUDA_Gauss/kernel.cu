@@ -3,34 +3,50 @@
 int main(int argc, char *argv[]){
 	srand((unsigned int)time(NULL));
 
-	float** matrix = new float*[COLUMN_LENGTH];
-	for (int i = 0; i < COLUMN_LENGTH; i++)
-		matrix[i] = new float[ROW_LENGTH];
-	float* vector = new float[COLUMN_LENGTH];
-	float* answer = new float[COLUMN_LENGTH];
+	float** matrixCPU = new float*[COLUMN_LENGTH];
+	float** matrixCUDA = new float*[COLUMN_LENGTH];
+	for (int i = 0; i < COLUMN_LENGTH; i++) {
+		matrixCPU[i] = new float[ROW_LENGTH];
+		matrixCUDA[i] = new float[ROW_LENGTH];
+	}		
+
+	float* vectorCPU = new float[COLUMN_LENGTH];
+	float* vectorCUDA = new float[COLUMN_LENGTH];
+
+	float* answerCPU = new float[COLUMN_LENGTH];
+	float* answerCUDA = new float[COLUMN_LENGTH];
+
 	int* key = new int[COLUMN_LENGTH];
 
-	//HOST
-	/*FillMAtrixRandom(matrix, vector);
-	PrintMatrix(matrix, vector, answer);
-	SortCPU(matrix, vector, answer);
-	PrintMatrix(matrix, vector, answer);
-	getchar();*/
+	key = FillMatrixRandom(matrixCPU, vectorCPU);
 
-	//printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+	for (int i = 0; i < COLUMN_LENGTH; i++) {
+		for (int j = 0; j < ROW_LENGTH; j++) {
+			matrixCUDA[i][j] = matrixCPU[i][j];
+		}
+	}
+
+	for (int i = 0; i < COLUMN_LENGTH; i++)
+		vectorCUDA[i] = vectorCPU[i];
+
+	//HOST
+	SortCPU(matrixCPU, vectorCPU, answerCPU);
+	CheckAnswer("CPU", answerCPU, key);
+
+	printf("\n\n");
 	
 	//Device
-	key = FillMatrixRandom(matrix, vector);
-	//FillMatrixDefault(matrix, vector);
-	PrintMatrix(matrix, vector, answer);
-	InitCUDA(matrix, vector, answer);
-	CheckAnswer(answer, key);
-	//PrintMatrix(matrix, vector, answer);
+	InitCUDA(matrixCUDA, vectorCUDA, answerCUDA);
+	CheckAnswer("CUDA", answerCUDA, key);
+
 	getchar();
 
-	free(matrix);
-	free(vector);
-	free(answer);
+	free(matrixCPU);
+	free(matrixCUDA);
+	free(vectorCPU);
+	free(vectorCUDA);
+	free(answerCPU);
+	free(answerCUDA);
 	free(key);
 	return 0;
 }
@@ -95,8 +111,14 @@ void FillMatrixDefault(float ** matrix, float * vector){
 }
 
 void SortCPU(float** matrix, float* vector, float* answer) {
+	std::clock_t start;
+
+	start = std::clock();	//timer start
 	ForwardSubstitution(matrix, vector);
 	BackSubstitution(matrix, vector, answer);
+	long double duration = (std::clock() - start) / (long double)CLOCKS_PER_SEC;	//timer stop
+
+	std::cout << "CPU sorting time: " << duration << " sec" << std::endl;
 }
 
 void PrintMatrix(float** matrix, float* vector, float* answer) {
@@ -135,12 +157,16 @@ void PrintMatrix(std::string stuff, float* matrix, float* vector, float* answer)
 	std::cout << std::endl << std::endl;
 }
 
-void CheckAnswer(float* answer, int* key) {
+void CheckAnswer(std::string type, float* answer, int* key) {
+	std::cout << type << ": ";
+
+	bool correct = true;
 	for (int i = 0; i < COLUMN_LENGTH; i++) {
-		if (abs(answer[i] - key[i]) > 0.001) {
-			std::cout << "answer incorrect" << std::endl;
-			return;
+		if (abs(answer[i] - key[i]) > 0.05) {
+			correct = false;
+			//std::cout << i << ": " << key[i] << " - " << answer[i] << std::endl;
 		}
 	}
-	std::cout << "CORRECT!" << std::endl;
+	if(correct == true) std::cout << "CORRECT!" << std::endl;
+	else std::cout << "incorrect" << std::endl;
 }

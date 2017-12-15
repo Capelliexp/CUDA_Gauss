@@ -5,7 +5,7 @@ void ForwardSubstitution(float** m, float* v) {
 	for (int i = 0; i < ROW_LENGTH; i++) {
 		for (int j = 0; j < COLUMN_LENGTH - 1; j++) {
 			if ((i + j + 1) < COLUMN_LENGTH) {
-				float factor = (m[i + j + 1][i] / m[i][i]) * (-1);
+				double factor = (m[i + j + 1][i] / m[i][i]) * (-1);
 				for (int k = 0; k < ROW_LENGTH; k++) {
 					m[i + j + 1][k] += (factor * m[i][k]);
 				}
