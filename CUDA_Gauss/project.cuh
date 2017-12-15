@@ -9,11 +9,10 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
-#define COLUMN_LENGTH 300 // y
-#define ROW_LENGTH 300 // x
+#define COLUMN_LENGTH 50 // y
+#define ROW_LENGTH 50 // x
 
-#define NR_OF_BLOCKS 1
-#define THREADS_PER_BLOCK 300
+#define THREADS_PER_BLOCK 50
 
 #define ELEMENTS_PER_THREAD (int)(COLUMN_LENGTH/THREADS_PER_BLOCK)
 

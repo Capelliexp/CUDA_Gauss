@@ -164,7 +164,7 @@ void CheckAnswer(std::string type, float* answer, int* key) {
 	for (int i = 0; i < COLUMN_LENGTH; i++) {
 		if (abs(answer[i] - key[i]) > 0.05) {
 			correct = false;
-			//std::cout << i << ": " << key[i] << " - " << answer[i] << std::endl;
+			std::cout << i << ": " << key[i] << " - " << answer[i] << std::endl;
 		}
 	}
 	if(correct == true) std::cout << "CORRECT!" << std::endl;

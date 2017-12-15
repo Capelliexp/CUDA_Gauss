@@ -44,10 +44,12 @@ void DeviceGaussForwardLower(float* d_m, float* d_v) {
 					RHS[g] += (factor * pivotRHS);
 				}
 
-				for (int j = 0; j < ROW_LENGTH; ++j) {
-					d_m[ROW_LENGTH*(id + g) + j] = (abs(LHS[g][j]) < 0.001 ? 0 : LHS[g][j]);
+				if (id < (i+(ELEMENTS_PER_THREAD)+g )) {	//MAGIC
+					for (int j = 0; j < ROW_LENGTH; ++j) {
+						d_m[ROW_LENGTH*(id + g) + j] = (abs(LHS[g][j]) < 0.001 ? 0 : LHS[g][j]);
+					}
+					d_v[id + g] = (abs(RHS[g]) < 0.001 ? 0 : RHS[g]);
 				}
-				d_v[id + g] = (abs(RHS[g]) < 0.001 ? 0 : RHS[g]);
 			}
 			++i;
 		}
@@ -95,11 +97,14 @@ void DeviceGaussForwardUpper(float* d_m, float* d_v, float* d_a) {
 					}
 					RHS[g] += (pivotRHS*factor);
 				}
-				for (int j = 0; j < ROW_LENGTH; ++j) {
-					d_m[ROW_LENGTH*(id + g) + j] = LHS[g][j];
+
+				if (id+g+1 > i-(ELEMENTS_PER_THREAD)) {	//MAGIC
+					for (int j = 0; j < ROW_LENGTH; ++j) {
+						d_m[ROW_LENGTH*(id + g) + j] = LHS[g][j];
+					}
+					d_v[id + g] = RHS[g];
+					d_a[id + g] = d_v[id + g] / d_m[(id + g)*ROW_LENGTH + (g == 0 ? i - 1 : i)];
 				}
-				d_v[id + g] = RHS[g];
-				d_a[id + g] = d_v[id + g] / d_m[(id + g)*ROW_LENGTH + (g == 0 ? i - 1 : i)];
 			}
 			--i;
 		}
@@ -140,8 +145,8 @@ void InitCUDA(float** m, float* v, float* a) {
 	cuErrorCheck(cudaMemcpy(d_a, a, COLUMN_LENGTH * sizeof(float), cudaMemcpyHostToDevice));
 
 	cudaEventRecord(start);	//clock start
-	DeviceGaussForwardLower<<<NR_OF_BLOCKS, THREADS_PER_BLOCK>>>(d_m, d_v);
-	DeviceGaussForwardUpper<<<NR_OF_BLOCKS, THREADS_PER_BLOCK>>>(d_m, d_v, d_a);
+	DeviceGaussForwardLower<<<1, THREADS_PER_BLOCK>>>(d_m, d_v);
+	DeviceGaussForwardUpper<<<1, THREADS_PER_BLOCK>>>(d_m, d_v, d_a);
 	cudaEventRecord(stop);	//clock stop
 
 	//time spent on CUDA gauss calc
